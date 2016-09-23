@@ -26,7 +26,7 @@ public class PicToPdf {
             // 设置中文字体
             //BaseFont bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
             BaseFont bfChinese = BaseFont.createFont();
-            Font FontChinese = new Font(bfChinese, 12, com.itextpdf.text.Font.NORMAL);
+            Font FontChinese = new Font(bfChinese, 12, Font.NORMAL);
             // 加入文字“HelloWorld ------ 中国北京,我的2008 .”
             String str = "HelloWorld ------ 中国北京, 我的2008 .";
             Paragraph tt = new Paragraph(str, FontChinese);
