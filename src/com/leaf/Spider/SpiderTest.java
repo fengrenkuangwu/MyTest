@@ -1,10 +1,5 @@
 package com.leaf.Spider;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,8 +7,17 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+
 public class SpiderTest {
 
+    /**
+     * 原始
+     * @throws Exception
+     */
 	@Test
 	public void getResderFromURL() throws Exception {
 		URL url = new URL("http://www.zhihu.com/question/31427895");
@@ -23,7 +27,11 @@ public class SpiderTest {
 			System.out.println(inputLine);
 		in.close();
 	}
-	
+
+    /**
+     * 只使用了Jsoup
+     * @throws IOException
+     */
 	@Test
 	public void getContext() throws IOException{
 		String url ="http://www.zhihu.com/question/31427895";

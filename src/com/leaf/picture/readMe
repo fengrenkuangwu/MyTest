@@ -1,0 +1,5 @@
+关于图片的一些处理，后续不断添加
+
+二维码生成 QrCodeUtil
+画图 WriteToPic：使用awt
+将图片文字写入pdf PicToPdf
