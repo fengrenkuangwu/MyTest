@@ -18,7 +18,11 @@ public class testFor {
 		System.out.println(null==as);
 		
 		List<String> bs = null;
-		System.out.println(bs.size());
+		//System.out.println(bs.size());
+
+        System.out.println("false".equals("false"));
+
+        System.out.println("012345678".substring(6));
 	}
 
 }
