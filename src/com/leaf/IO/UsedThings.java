@@ -17,17 +17,7 @@ import org.junit.Test;
 
 public class UsedThings {
 
-	/**
-	 * 系统信息
-	 */
-	@Test
-	public void showSystemInfo(){
-		Properties properties = System.getProperties();
-		for (Map.Entry<?, ?> e : properties.entrySet()) {
-			System.out.println("[" + e.getKey() + "] " + e.getValue());
-		}
-	}
-	
+
 	/**
 	 * 把gbk的文本文档复制为utf8的文本文档
 	 * @throws IOException
