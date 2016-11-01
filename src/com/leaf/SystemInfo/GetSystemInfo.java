@@ -7,8 +7,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by pekall on 16-10-19.
@@ -33,9 +32,12 @@ public class GetSystemInfo {
         System.out.println(path);
         String sigarLibPath = this.getClass().getResource("").getPath()+"lib";
         System.out.println(sigarLibPath);
-        path += ":" + sigarLibPath;
-        System.out.println(path);
-        System.setProperty("java.library.path", path);
+        if(!path.contains(sigarLibPath)){
+            //如果是windows使用;号隔开
+            path += ":" + sigarLibPath;
+            System.out.println(path);
+            System.setProperty("java.library.path", path);
+        }
 
         OperatingSystem OS = OperatingSystem.getInstance();
 
@@ -60,12 +62,25 @@ public class GetSystemInfo {
         // 操作系统的版本号
         System.out.println("版本号 = " + OS.getVersion());
 
-        System.out.println("==============cpu===================");
-        Sigar sigar = new Sigar();
-        CpuInfo infos[] = new CpuInfo[0];
+
         try {
+            System.out.println("==============cpu===================");
+            Sigar sigar = new Sigar();
+            CpuInfo infos[] = new CpuInfo[0];
             infos = sigar.getCpuInfoList();
+            CpuPerc cpu1[] = sigar.getCpuPercList();
+            for(CpuPerc info : cpu1){
+                // 用户使用率
+                System.out.println("User :" + CpuPerc.format(info.getUser()));
+                // 系统使用率
+                System.out.println("Sys :" + CpuPerc.format(info.getSys()));
+            }
+            System.out.println("-------------------------------");
             CpuPerc cpu = sigar.getCpuPerc();
+            // 用户使用率
+            System.out.println("User :" + CpuPerc.format(cpu.getUser()));
+            // 系统使用率
+            System.out.println("Sys :" + CpuPerc.format(cpu.getSys()));
             String address = InetAddress.getLocalHost().getHostAddress();
             System.out.println("本机IP地址" + address);
             for (int i = 0; i <infos.length; i++)
@@ -126,6 +141,10 @@ public class GetSystemInfo {
                 System.out.println(" DiskReads = " + usage.getDiskReads());
                 System.out.println(" DiskWrites = " + usage.getDiskWrites());
             }
+            Mem mem = sigar.getMem();
+            System.out.println(" mem : " + mem);
+            NetInfo netInfo = sigar.getNetInfo();
+            System.out.println(" netInfo : " + netInfo);
         } catch (SigarException e) {
             e.printStackTrace();
         } catch (UnknownHostException e) {
@@ -135,7 +154,7 @@ public class GetSystemInfo {
 
 
 
-        if (java.awt.Desktop.isDesktopSupported())
+        /*if (java.awt.Desktop.isDesktopSupported())
         {
             try
             {
@@ -185,6 +204,98 @@ public class GetSystemInfo {
                 //此为无法获取系统默认浏览器
             }
 
+        }*/
+    }
+
+    public Map<String,Object> getSystemInfoMap(){
+        Map<String,Object> systemInfo = new HashMap<>();
+        String path = System.getProperty("java.library.path");
+        String sigarLibPath = this.getClass().getResource("").getPath()+"lib";
+//        if(log.isDebugEnabled()){
+//            log.debug("path:"+path);
+//            log.debug("sigarLibPath:"+sigarLibPath);
+//        }
+        if(!path.contains(sigarLibPath)){
+            //如果是windows使用;号隔开
+            path += ":" + sigarLibPath;
+//            if(log.isDebugEnabled()){
+//                log.debug("path:"+path);
+//            }
+            System.setProperty("java.library.path", path);
         }
+        try {
+            OperatingSystem OS = OperatingSystem.getInstance();
+            systemInfo.put("arch",OS.getArch());
+            systemInfo.put("description",OS.getDescription());
+            //String address = InetAddress.getLocalHost().getHostAddress();
+            systemInfo.put("ipAddress",InetAddress.getLocalHost().getHostAddress());
+
+            Sigar sigar = new Sigar();
+
+            Mem mem = sigar.getMem();
+            Map<String, Object> memInfo = new HashMap<>();
+            memInfo.put("total",mem.getTotal()/1024/1024 + "GB");
+            memInfo.put("free",mem.getFree()/1024/1024 + "GB");
+            memInfo.put("used",mem.getUsed()/1024/1024 + "GB");
+            memInfo.put("freePercent",mem.getFreePercent());
+            memInfo.put("usedPercent",mem.getUsedPercent());
+            systemInfo.put("mem",mem);
+
+            Map<String, Object> cupInfo = new HashMap<>();
+            CpuPerc cpu = sigar.getCpuPerc();
+            cupInfo.put("user",CpuPerc.format(cpu.getUser()));
+            cupInfo.put("sys",CpuPerc.format(cpu.getSys()));
+            CpuPerc cpus[] = sigar.getCpuPercList();
+            cupInfo.put("detail",cpus);
+            CpuInfo infos[] = sigar.getCpuInfoList();
+            cupInfo.put("infos",infos);
+            systemInfo.put("cupInfo",cupInfo);
+
+            FileSystem fslist[] = sigar.getFileSystemList();
+            List<Map<String,Object>> fileSystems = new ArrayList<>();
+
+            for (FileSystem fs : fslist){
+                Map<String,Object> fileSystem = new HashMap<>();
+                // 分区的盘符名称
+                fileSystem.put("devName",fs.getDevName());
+                // 分区的盘符名称
+                fileSystem.put("dirName",fs.getDirName());
+                // 文件系统类型，比如 FAT32、NTFS
+                fileSystem.put("sysTypeName",fs.getSysTypeName());
+                // 文件系统类型名，比如本地硬盘、光驱、网络文件系统等
+                fileSystem.put("typeName",fs.getTypeName());
+                // 文件系统类型
+
+                FileSystemUsage usage = sigar.getFileSystemUsage(fs.getDirName());
+                // 文件系统总大小
+                fileSystem.put("total",usage.getTotal()/1024/1024 + "GB");
+                // 文件系统剩余大小
+                fileSystem.put("free",usage.getFree()/1024/1024 + "GB");
+                // 文件系统可用大小
+                fileSystem.put("avail",usage.getAvail()/1024/1024 + "GB");
+                // 文件系统已经使用量
+                fileSystem.put("used",usage.getUsed()/1024/1024 + "GB");
+                double usePercent = usage.getUsePercent() * 100D;
+                // 文件系统资源的利用率
+                fileSystem.put("usePercent",usePercent+"%");
+                fileSystem.put("diskReads",usage.getDiskReads());
+                fileSystem.put("diskWrites",usage.getDiskWrites());
+
+                fileSystems.add(fileSystem);
+            }
+            systemInfo.put("fileSystems",fileSystems);
+        } catch (SigarException e) {
+            e.printStackTrace();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        return systemInfo;
+    }
+
+    @Test
+    public void getInfo(){
+        Map<String,Object> systemInfoMap = getSystemInfoMap();
+        System.out.println(systemInfoMap.toString());
     }
 }
