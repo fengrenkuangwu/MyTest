@@ -6,6 +6,7 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by pekall on 16-11-26.
+ * A 和 B 是一起的，在B中运行
  */
 public class B {
     @Test

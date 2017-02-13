@@ -20,7 +20,7 @@ public class PicToPdf {
         try {
 
             // 定义输出位置并把文档对象装入输出对象中
-            PdfWriter.getInstance(doc, new FileOutputStream("/home/pekall/桌面/test.pdf"));
+            PdfWriter.getInstance(doc, new FileOutputStream("/home/pekall/桌面/DoubleTest.pdf"));
             // 打开文档对象
             doc.open();
             // 设置中文字体
