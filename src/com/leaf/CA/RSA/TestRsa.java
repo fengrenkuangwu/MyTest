@@ -2,6 +2,7 @@ package com.leaf.CA.RSA;
 
 
 import org.apache.commons.codec.binary.Base64;
+import org.junit.Test;
 
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -19,7 +20,7 @@ public class TestRsa {
     public static void createKeyPairs() throws Exception {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         // create the keys
-        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "BC");
+        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA","BC");
         generator.initialize(512, new SecureRandom());
         KeyPair pair = generator.generateKeyPair();
         PublicKey pubKey = pair.getPublic();
@@ -44,4 +45,9 @@ public class TestRsa {
         System.out.println(pubKey.equals(pubkey2));
         System.out.println(privKey.equals(privkey2));
     }
+
+     @Test
+     public void test1() throws Exception {
+         createKeyPairs();
+     }
 }
