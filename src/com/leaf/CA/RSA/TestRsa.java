@@ -14,13 +14,14 @@ import java.util.Arrays;
  */
 public class TestRsa {
     /**
-     * RSA公钥和私钥的创建，及进行Base64编码后保存
+     * RSA公钥和私钥的创建，及进行Base64编码后保存(pkcs8)
      * @throws Exception
      */
     public static void createKeyPairs() throws Exception {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         // create the keys
-        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA","BC");
+        //KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA","BC");
+        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
         generator.initialize(512, new SecureRandom());
         KeyPair pair = generator.generateKeyPair();
         PublicKey pubKey = pair.getPublic();
@@ -38,7 +39,8 @@ public class TestRsa {
         X509EncodedKeySpec pubX509 = new X509EncodedKeySpec(Base64.decodeBase64(strpk.getBytes()));
         PKCS8EncodedKeySpec priPKCS8 = new PKCS8EncodedKeySpec(Base64.decodeBase64(strprivk.getBytes()));
 
-        KeyFactory keyf = KeyFactory.getInstance("RSA", "BC");
+        //KeyFactory keyf = KeyFactory.getInstance("RSA", "BC");
+        KeyFactory keyf = KeyFactory.getInstance("RSA");
         PublicKey pubkey2 = keyf.generatePublic(pubX509);
         PrivateKey privkey2 = keyf.generatePrivate(priPKCS8);
 
