@@ -138,4 +138,94 @@ public class ReadAndWriteTest {
         }
 
     }
+
+    /**
+     * 剔除日志中的东西
+     */
+    @Test
+    public void test2(){
+        String path = "/home/pekall/桌面/debug-20170314.log";
+        File dir = new File(path);
+        ergodicFile(dir);
+        System.out.println(fileList.toString());
+        for (String filePath : fileList) {
+            File oldLog = new File(filePath);
+            FileWriter fw= null;
+            try {
+                File newLog = new File(filePath+".new");
+                if(!newLog.exists()){
+                    newLog.createNewFile();
+                }
+                fw = new FileWriter(newLog);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //写入中文字符时会出现乱码
+            BufferedWriter bw=new BufferedWriter(fw);
+
+            BufferedReader bf = null;
+            try {
+                bf = new BufferedReader(new FileReader(oldLog));
+                String line = null;
+                while ((line = bf.readLine()) != null) {
+                    if(!line.contains("DEBUG org.apache.kafka.clients.NetworkClient.handleDisconnections:463 -Node -1 disconnected.") &&
+                            !line.contains("DEBUG org.apache.kafka.clients.NetworkClient.maybeUpdate:644 -Initialize connection to node -1 for sending metadata request") &&
+                            !line.contains("DEBUG org.apache.kafka.clients.NetworkClient.initiateConnect:496 -Initiating connection to node -1 at 10.112.57.239:9092.") &&
+                            !line.contains("DEBUG org.apache.kafka.common.network.Selector.pollSelectionKeys:345 -Connection with /10.112.57.239 disconnected") &&
+                            !line.contains("java.net.ConnectException: 拒绝连接") &&
+                            !line.contains("at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)") &&
+                            !line.contains("at sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:739)") &&
+                            !line.contains("at org.apache.kafka.common.network.PlaintextTransportLayer.finishConnect(PlaintextTransportLayer.java:51)") &&
+                            !line.contains("at org.apache.kafka.common.network.KafkaChannel.finishConnect(KafkaChannel.java:73)") &&
+                            !line.contains("at org.apache.kafka.common.network.Selector.pollSelectionKeys(Selector.java:309)") &&
+                            !line.contains("at org.apache.kafka.common.network.Selector.poll(Selector.java:283)") &&
+                            !line.contains("at org.apache.kafka.clients.NetworkClient.poll(NetworkClient.java:260)") &&
+                            !line.contains("at org.apache.kafka.clients.producer.internals.Sender.run(Sender.java:229)") &&
+                            !line.contains("at org.apache.kafka.clients.producer.internals.Sender.run(Sender.java:134)") &&
+                            !line.contains("at java.lang.Thread.run(Thread.java:744)")){
+                        bw.write(line+"\t\n");
+                    }
+                }
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                bw.close();
+                fw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+
+    private List<String> fileList = new ArrayList<>();
+    void ergodicFile(File dir,String suffixStr){
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                ergodicFile(new File(dir, children[i]),suffixStr);
+            }
+        }
+        String fileName = dir.getName();
+        if(fileName.length()>suffixStr.length() && suffixStr.equals(fileName.substring(fileName.length() - suffixStr.length()))){
+            fileList.add(dir.getPath());
+        }
+    }
+
+    void ergodicFile(File dir){
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                ergodicFile(new File(dir, children[i]));
+            }
+        }else{
+            fileList.add(dir.getPath());
+        }
+    }
 }

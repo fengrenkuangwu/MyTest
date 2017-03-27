@@ -3,6 +3,7 @@ package com.leaf.classAbout;
 import org.junit.Test;
 
 import java.lang.reflect.*;
+import java.util.ArrayList;
 
 
 /**
@@ -229,13 +230,9 @@ public class TestClass {
      */
     /**
      * 在java中有三种类类加载器。
-     *
      * 1）Bootstrap ClassLoader 此加载器采用c++编写，一般开发中很少见。
-     *
      * 2）Extension ClassLoader 用来进行扩展类的加载，一般对应的是jrelibext目录中的类
-     *
      * 3）AppClassLoader 加载classpath指定的类，是最常用的加载器。同时也是java中默认的加载器。
-     *
      * 如果想要完成动态代理，首先需要定义一个InvocationHandler接口的子类，已完成代理的具体操作。
      *
      * @author xsoftlab.net
@@ -247,6 +244,31 @@ public class TestClass {
         Subject sub = (Subject) demo.bind(new RealSubject());
         String info = sub.say("Rollen", 20);
         System.out.println(info);
+    }
+
+    /**
+     * 反射机制的应用实例
+     * 在泛型为Integer的ArrayList中存放一个String类型的对象。
+     */
+    @Test
+    public void test10() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        ArrayList<Integer> list = new ArrayList<>();
+        System.out.println("list 中的泛型为："+list.getClass().getComponentType());
+        Method method = list.getClass().getMethod("add",Object.class);
+        method.invoke(list,"java反射机制实例。");
+        System.out.println(list.get(0));
+        System.out.println("list 中的泛型为："+list.getClass().getComponentType());
+    }
+
+    @Test
+    public void test11(){
+        int[] temp = {1,2,3,4,5};
+        Class<?> demo = temp.getClass().getComponentType();
+        System.out.println("数组类型："+demo.getName());
+        System.out.println("数组长度："+Array.getLength(temp));
+        System.out.println("数组的第一个元素："+Array.get(temp,0));
+        Array.set(temp, 0, 100);
+        System.out.println("修改之后数组的第一个元素："+Array.get(temp,0));
     }
 
     /******************************************************************************************************************/
