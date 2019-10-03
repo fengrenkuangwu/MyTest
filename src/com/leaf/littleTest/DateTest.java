@@ -1,9 +1,11 @@
 package com.leaf.littleTest;
 
+import com.leaf.json.TestJsonBean;
 import org.junit.Test;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by leaf on 16-10-21.
@@ -20,5 +22,12 @@ public class DateTest {
 
         System.out.println(d);
         System.out.println(dd);
+
+        //null强转对象 强转不报错，转后的对象为null
+        List aa = (List)null;
+        TestJsonBean a = new TestJsonBean();
+        a = (TestJsonBean)null;
     }
+
+
 }
